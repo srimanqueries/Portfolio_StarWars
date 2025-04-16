@@ -1,0 +1,23 @@
+/* Custom styles not covered by Tailwind */
+@font-face {
+    font-family: 'Star Jedi Hollow';
+    src: url('path-to-star-wars-font.woff2') format('woff2');
+  }
+  
+  body {
+    scroll-behavior: smooth;
+  }
+  
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translate(-50%, 0); }
+    50% { transform: translate(-50%, -5px); }
+  }
+  .your-style {
+    font-family: 'Star Jedi Hollow';
+    font-weight: normal;
+    font-style: normal;
+}

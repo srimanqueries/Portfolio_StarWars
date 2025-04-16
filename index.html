@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sriman Reddy Rondla - Jedi of Data</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+  <style>
+    @font-face {
+      font-family: 'StarJediHollow';
+      src: url('StarJediHollow.woff2') format('woff2');
+      font-weight: normal;
+      font-style: normal;
+    }
+    body {
+      background: #000;
+      color: #e0e0e0;
+      font-family: 'StarJediHollow', sans-serif;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+    .starfield {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+    .multicolor-glow {
+      animation: glow 3s infinite;
+    }
+    @keyframes glow {
+      0% { text-shadow: 0 0 10px #ff0, 0 0 20px #ff0; filter: drop-shadow(0 0 10px #ff0); }
+      33% { text-shadow: 0 0 10px #f00, 0 0 20px #f00; filter: drop-shadow(0 0 10px #f00); }
+      66% { text-shadow: 0 0 10px #00f, 0 0 20px #00f; filter: drop-shadow(0 0 10px #00f); }
+      100% { text-shadow: 0 0 10px #ff0, 0 0 20px #ff0; filter: drop-shadow(0 0 10px #ff0); }
+    }
+    .blink-title {
+      animation: blink 1s step-end 5;
+      opacity: 1;
+      transition: opacity 1s;
+    }
+    @keyframes blink {
+      50% { opacity: 0.3; }
+    }
+    .crawl-container {
+      perspective: 600px;
+      height: 100vh;
+      overflow: hidden;
+      display: none;
+      z-index: 5;
+    }
+    .crawl {
+      transform: rotateX(45deg);
+      animation: crawl 30s linear;
+      color: #ff0;
+      font-size: 1.25rem;
+      text-align: center;
+      width: 100%;
+      position: absolute;
+      bottom: 0;
+      opacity: 1;
+    }
+    .crawl-intro {
+      color: #4bd5ee;
+      font-size: 1.5rem;
+      opacity: 1;
+      animation: fadeIntro 4s forwards;
+    }
+    .crawl-logo {
+      font-size: 4rem;
+      color: #ff0;
+      text-shadow: 0 0 20px #ff0;
+      margin: 2rem 0;
+    }
+    .crawl-episode {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+    @keyframes crawl {
+      0% { transform: rotateX(45deg) translateY(1000px); opacity: 1; }
+      80% { transform: rotateX(45deg) translateY(-2000px); opacity: 1; }
+      100% { transform: rotateX(45deg) translateY(-2000px); opacity: 0; }
+    }
+    @keyframes fadeIntro {
+      0% { opacity: 1; }
+      80% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+    .terminal-text {
+      font-family: 'VT323', monospace;
+      color: #00ff00;
+      opacity: 0;
+      animation: type 2s steps(30, end) forwards;
+    }
+    @keyframes type {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    .fade-in {
+      opacity: 0;
+      animation: fadeInAnimation 1s ease-in forwards;
+    }
+    @keyframes fadeInAnimation {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(255, 255, 0, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(255, 255, 0, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 255, 0, 0); }
+    }
+    .holo-pulse {
+      animation: holoPulse 2s infinite;
+    }
+    @keyframes holoPulse {
+      0% { box-shadow: 0 0 10px rgba(0, 255, 255, 0.5); }
+      50% { box-shadow: 0 0 20px rgba(0, 255, 255, 0.3); }
+      100% { box-shadow: 0 0 10px rgba(0, 255, 255, 0.5); }
+    }
+    .lightsaber-cursor {
+      cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><rect x="14" y="0" width="4" height="32" fill="yellow" filter="url(%23glow)"/><defs><filter id="glow"><feGaussianBlur stdDeviation="2" result="glow"/><feMerge><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs></svg>') 16 16, auto;
+    }
+    .card-container {
+      perspective: 1000px;
+      width: 300px;
+      height: 200px;
+      cursor: pointer;
+      transform: scale(1);
+      transition: transform 0.3s;
+      z-index: 30;
+    }
+    .card-container:hover {
+      transform: scale(1.05);
+    }
+    .card {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.6s;
+      z-index: 30;
+    }
+    .card.flipped {
+      transform: rotateY(180deg);
+      z-index: 35;
+    }
+    .card-front, .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 1rem;
+      border: 2px solid #ff0;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.7);
+    }
+    .card-front {
+      color: #ff0;
+    }
+    .card-back {
+      transform: rotateY(180deg);
+      background: radial-gradient(circle, rgba(0, 255, 255, 0.2), rgba(0, 0, 0, 0.8)), url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2P8z/D/PwMDAwMDw/D/PwYGBgYGBobh/38GBgYGBoaT3w4L2D7K0gAAAABJRU5ErkJggg==');
+      color: #00ff00;
+      font-family: 'VT323', monospace;
+    }
+    .card-back p {
+      transform: translateZ(20px);
+      text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00;
+      transition: transform 0.2s;
+      font-size: 1.25rem;
+    }
+    .nav-hidden {
+      opacity: 0;
+      z-index: 15;
+      pointer-events: none;
+      transition: opacity 0.5s, z-index 0.5s;
+    }
+    .jedi-photo {
+      transition: transform 0.3s;
+    }
+    .jedi-photo:hover {
+      transform: scale(1.05);
+    }
+    .project-graphic {
+      width: 80px;
+      height: 80px;
+      margin: 8px 0;
+      z-index: 30;
+    }
+    .grc-security {
+      animation: pulse-security 2s infinite;
+    }
+    .leadership-command {
+      animation: rotate-command 3s infinite linear;
+    }
+    .innovation-blueprint {
+      animation: flow-blueprint 2.5s ease-in-out infinite;
+    }
+    @keyframes pulse-security {
+      0% { transform: scale(1); filter: brightness(1); }
+      50% { transform: scale(1.05); filter: brightness(1.2); }
+      100% { transform: scale(1); filter: brightness(1); }
+    }
+    @keyframes rotate-command {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    @keyframes flow-blueprint {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+      100% { transform: translateY(0); }
+    }
+    .hyperspace-jump {
+      animation: hyperspaceJump 0.5s ease-out;
+    }
+    @keyframes hyperspaceJump {
+      0% { filter: blur(0); background: rgba(255, 255, 255, 0); }
+      50% { filter: blur(5px); background: rgba(255, 255, 255, 0.2); }
+      100% { filter: blur(0); background: rgba(255, 255, 255, 0); }
+    }
+    .game-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      z-index: 1000;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .game-canvas {
+      border: 2px solid #ff0;
+      background: #000;
+    }
+    .game-score {
+      color: #ff0;
+      font-family: 'StarJediHollow', sans-serif;
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+    .game-over {
+      display: none;
+      color: #ff0;
+      font-family: 'StarJediHollow', sans-serif;
+      font-size: 2rem;
+      text-align: center;
+    }
+    .game-over button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #ff0;
+      color: #000;
+      border: none;
+      border-radius: 5px;
+      font-family: 'StarJediHollow', sans-serif;
+      cursor: pointer;
+    }
+    @media (max-width: 768px) {
+      .crawl { font-size: 1rem; }
+      .crawl-intro { font-size: 1.25rem; }
+      .crawl-logo { font-size: 2.5rem; }
+      .crawl-episode { font-size: 1.5rem; }
+      .crawl-container { perspective: 400px; }
+      h2 { font-size: 2rem; }
+      .text-xl { font-size: 1rem; }
+      .text-lg { font-size: 0.875rem; }
+      .text-4xl { font-size: 1.5rem; }
+      .text-6xl { font-size: 2.5rem; }
+      .card-container {
+        width: 90%;
+        height: 150px;
+      }
+      .card-back p {
+        font-size: 1rem;
+      }
+      .jedi-photo {
+        width: 90%;
+        max-width: 150px;
+      }
+      .project-graphic {
+        width: 60px;
+        height: 60px;
+      }
+      .game-canvas {
+        width: 90%;
+        height: 70%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Starfield Canvas -->
+  <canvas class="starfield"></canvas>
+
+  <!-- Audio Controls -->
+  <audio id="crawlTheme" src="starwars_crawl.mp3" loop></audio>
+  <audio id="lightsaberHum" src="lightsaber_hum.mp3" preload="auto"></audio>
+  <button id="muteButton" class="fixed top-4 right-4 bg-yellow-500 text-black p-2 rounded multicolor-glow lightsaber-cursor">Mute</button>
+
+  <!-- Game Overlay -->
+  <div id="gameOverlay" class="game-overlay">
+    <div id="scoreDisplay" class="game-score">Score: 0</div>
+    <canvas id="gameCanvas" class="game-canvas" width="800" height="600"></canvas>
+    <div id="gameOver" class="game-over">
+      <div>Game Over!</div>
+      <div id="finalScore"></div>
+      <button id="restartGame">Return to Portfolio</button>
+    </div>
+  </div>
+
+  <!-- Blinking Title Section -->
+  <section id="title" class="h-screen flex items-center justify-center z-10 fade-in">
+    <h1 class="text-4xl md:text-6xl text-yellow-400 blink-title multicolor-glow text-center">
+      Jedi of Data<br>Defender of Digital Systems
+    </h1>
+  </section>
+
+  <!-- Crawl Animation -->
+  <section class="crawl-container" id="crawl">
+    <div class="crawl">
+      <p class="crawl-intro">A long time ago in a galaxy far, far away....</p>
+      <h1 class="crawl-logo">STAR WARS</h1>
+      <h2 class="crawl-episode">Episode I<br>THE DATA PHANTOM</h2>
+      <p class="max-w-2xl mx-auto">
+        Turmoil has engulfed the digital galaxy. As threats to security multiply, a new hope emerges.<br><br>
+        Sriman Reddy Rondla, a Jedi of Data trained at Clark University, wields the powers of Splunk, Python, and SQL to forge solutions like E-Commerce Databases and ML Spam Detectors.<br><br>
+        Leading Operation Saheli to empower communities, he seeks to restore balance to the systems of the stars...
+      </p>
+    </div>
+  </section>
+
+  <!-- Back to Top Button -->
+  <a href="#" class="fixed bottom-8 right-8 bg-yellow-500 text-black p-3 rounded-full pulse multicolor-glow lightsaber-cursor z-50">Back to Top</a>
+
+  <!-- Navigation -->
+  <nav id="navbar" class="fixed top-0 w-full bg-black bg-opacity-50 p-4 flex justify-between items-center z-20 backdrop-blur-sm">
+    <a href="#" class="text-2xl text-yellow-400 multicolor-glow lightsaber-cursor hyperspace-jump">Sriman Reddy Rondla</a>
+    <div class="space-x-4">
+      <a href="#about" class="text-yellow-300 multicolor-glow lightsaber-cursor hyperspace-jump">About</a>
+      <a href="#jedi-profile" class="text-yellow-300 multicolor-glow lightsaber-cursor hyperspace-jump">Jedi Profile</a>
+      <a href="#mission-logs" class="text-yellow-300 multicolor-glow lightsaber-cursor hyperspace-jump">Mission Logs</a>
+      <a href="#galactic-research" class="text-yellow-300 multicolor-glow lightsaber-cursor hyperspace-jump">Galactic Research</a>
+      <a href="#command-post" class="text-yellow-300 multicolor-glow lightsaber-cursor hyperspace-jump">Command Post</a>
+      <a href="#saheli" class="text-yellow-300 multicolor-glow lightsaber-cursor hyperspace-jump">Saheli</a>
+      <a href="#bored" class="text-yellow-300 multicolor-glow lightsaber-cursor hyperspace-jump">Bored?</a>
+      <a href="#contact" class="text-yellow-300 multicolor-glow lightsaber-cursor hyperspace-jump">Contact</a>
+    </div>
+  </nav>
+
+  <!-- About Me -->
+  <section id="about" class="min-h-screen flex flex-col justify-center items-center p-8 fade-in">
+    <h2 class="text-4xl text-yellow-400 multicolor-glow mb-6">About Me</h2>
+    <div class="flex flex-col md:flex-row items-center max-w-4xl">
+      <img src="./sriman-jedi.jpg" alt="Sriman Reddy Rondla" class="w-48 h-48 rounded-full mb-4 md:mb-0 md:mr-8 jedi-photo multicolor-glow object-cover object-center">
+      <div class="text-center md:text-left">
+        <p class="text-lg">Sriman Reddy Rondla</p>
+        <p class="text-lg">Master’s in IT, Clark University (GPA 3.7)</p>
+        <p class="text-lg">OPT Starts: July 2025 | F1 Visa</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Jedi Profile -->
+  <section id="jedi-profile" class="min-h-screen flex flex-col justify-center items-center p-8 bg-black bg-opacity-50 fade-in">
+    <h2 class="text-4xl text-yellow-400 multicolor-glow mb-6">Jedi Profile</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl">
+      <div class="card-container mx-auto">
+        <div class="card">
+          <div class="card-front multicolor-glow">
+            <h3 class="text-xl">Who am I?</h3>
+          </div>
+          <div class="card-back holo-pulse">
+            <p class="multicolor-glow">A Jedi Knight of Data, mastering IT at Clark University with a 3.7 GPA, ready to secure the galaxy’s systems.</p>
+          </div>
+        </div>
+      </div>
+      <div class="card-container mx-auto">
+        <div class="card">
+          <div class="card-front multicolor-glow">
+            <h3 class="text-xl">What sparked it all?</h3>
+          </div>
+          <div class="card-back holo-pulse">
+            <p class="multicolor-glow">Fueled by cyber-thrillers, I ignited a passion to outsmart digital threats and innovate solutions.</p>
+          </div>
+        </div>
+      </div>
+      <div class="card-container mx-auto">
+        <div class="card">
+          <div class="card-front multicolor-glow">
+            <h3 class="text-xl">What am I trained in?</h3>
+          </div>
+          <div class="card-back holo-pulse">
+            <p class="multicolor-glow">Armed with Splunk, Metasploit, Wireshark, Python, and SQL—my arsenal for conquering cyber challenges.</p>
+          </div>
+        </div>
+      </div>
+      <div class="card-container mx-auto">
+        <div class="card">
+          <div class="card-front multicolor-glow">
+            <h3 class="text-xl">What do I stand for?</h3>
+          </div>
+          <div class="card-back holo-pulse">
+            <p class="multicolor-glow">Champion of Saheli, empowering 200+ lives with education and dignity, building a brighter future.</p>
+          </div>
+        </div>
+      </div>
+      <div class="card-container mx-auto">
+        <div class="card">
+          <div class="card-front multicolor-glow">
+            <h3 class="text-xl">What’s my mission?</h3>
+          </div>
+          <div class="card-back holo-pulse">
+            <p class="multicolor-glow">To shield systems, spark community growth, and drive innovation across the digital stars.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Mission Logs -->
+  <section id="mission-logs" class="min-h-screen flex flex-col justify-center items-center p-8 fade-in">
+    <h2 class="text-4xl text-yellow-400 multicolor-glow mb-6">Mission Logs</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl">
+      <div class="p-6 bg-black bg-opacity-70 border-2 border-yellow-500 rounded-lg pulse card-container">
+        <div class="flex items-center">
+          <svg class="project-graphic ecommerce-graph" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0" y="0" width="100" height="100" fill="#1a2b3c" stroke="#ff0" stroke-width="4"/>
+            <text x="10" y="20" font-size="12" fill="#ff0" font-family="StarJediHollow">E-Commerce Database Design</text>
+            <path d="M10 40 L30 60 L50 50 L70 70 L90 40" stroke="#ff0" stroke-width="2" fill="none"/>
+            <rect x="10" y="40" width="5" height="20" fill="#ff0">
+              <animate attributeName="height" values="20;25;20" dur="2s" repeatCount="indefinite"/>
+            </rect>
+            <rect x="30" y="60" width="5" height="10" fill="#ff0">
+              <animate attributeName="height" values="10;15;10" dur="2s" repeatCount="indefinite"/>
+            </rect>
+            <rect x="50" y="50" width="5" height="15" fill="#ff0">
+              <animate attributeName="height" values="15;20;15" dur="2s" repeatCount="indefinite"/>
+            </rect>
+            <rect x="70" y="70" width="5" height="5" fill="#ff0">
+              <animate attributeName="height" values="5;10;5" dur="2s" repeatCount="indefinite"/>
+            </rect>
+            <rect x="80" y="70" width="10" height="20" fill="#333" stroke="#ff0"/>
+          </svg>
+          <h3 class="text-xl text-yellow-300 multicolor-glow">E-Commerce Database Design</h3>
+        </div>
+        <p class="terminal-text mt-2">SQL • ERD • Stored Procedures</p>
+        <a href="project-ecommerce.html" class="mt-4 inline-block px-4 py-2 bg-yellow-500 text-black rounded multicolor-glow lightsaber-cursor">Full Story</a>
+      </div>
+      <div class="p-6 bg-black bg-opacity-70 border-2 border-yellow-500 rounded-lg pulse card-container">
+        <div class="flex items-center">
+          <svg class="project-graphic ml-filter" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0" y="0" width="100" height="100" fill="#1a2b3c" stroke="#ff0" stroke-width="4"/>
+            <text x="10" y="20" font-size="12" fill="#ff0" font-family="StarJediHollow">ML-Based Spam Detector</text>
+            <rect x="20" y="40" width="60" height="40" fill="#0000ff" opacity="0.5"/>
+            <path d="M20 50 L80 50" stroke="#ff0000" stroke-width="2" opacity="0.7"/>
+            <path d="M20 60 L80 60" stroke="#ff0000" stroke-width="2" opacity="0.7"/>
+            <rect x="30" y="45" width="10" height="10" fill="#00ff00" rx="2">
+              <animateTransform attributeName="transform" type="translate" values="0 0; 40 0; 0 0" dur="3s" repeatCount="indefinite"/>
+            </rect>
+            <rect x="60" y="45" width="10" height="10" fill="#ff0000" rx="2">
+              <animateTransform attributeName="transform" type="translate" values="0 0; -40 0; 0 0" dur="3s" repeatCount="indefinite"/>
+            </rect>
+          </svg>
+          <h3 class="text-xl text-yellow-300 multicolor-glow">ML-Based Spam Detector</h3>
+        </div>
+        <p class="terminal-text mt-2">Python • Text Classification</p>
+        <a href="project-ml-spam.html" class="mt-4 inline-block px-4 py-2 bg-yellow-500 text-black rounded multicolor-glow lightsaber-cursor">Full Story</a>
+      </div>
+      <div class="p-6 bg-black bg-opacity-70 border-2 border-yellow-500 rounded-lg pulse card-container">
+        <div class="flex items-center">
+          <svg class="project-graphic splunk-heat" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0" y="0" width="100" height="100" fill="#1a2b3c" stroke="#ff0" stroke-width="4"/>
+            <text x="10" y="20" font-size="12" fill="#ff0" font-family="StarJediHollow">Crime Data Analysis – Splunk</text>
+            <rect x="20" y="40" width="60" height="40" fill="url(#heatmap)" opacity="0.6"/>
+            <circle cx="50" cy="60" r="5" fill="#ff4500">
+              <animate attributeName="r" values="5;7;5" dur="1.5s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="40" cy="50" r="3" fill="#ff0000">
+              <animate attributeName="r" values="3;5;3" dur="1.5s" repeatCount="indefinite"/>
+            </circle>
+            <rect x="70" y="50" width="10" height="20" fill="#333" stroke="#ff0"/>
+            <defs>
+              <radialGradient id="heatmap">
+                <stop offset="0%" stop-color="#ff0000"/>
+                <stop offset="100%" stop-color="#ff4500"/>
+              </radialGradient>
+            </defs>
+          </svg>
+          <h3 class="text-xl text-yellow-300 multicolor-glow">Crime Data Analysis – Splunk</h3>
+        </div>
+        <p class="terminal-text mt-2">Splunk • Data Visualization</p>
+        <a href="project-splunk.html" class="mt-4 inline-block px-4 py-2 bg-yellow-500 text-black rounded multicolor-glow lightsaber-cursor">Full Story</a>
+      </div>
+      <div class="p-6 bg-black bg-opacity-70 border-2 border-yellow-500 rounded-lg pulse card-container">
+        <div class="flex items-center">
+          <svg class="project-graphic ux-nav" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0" y="0" width="100" height="100" fill="#1a2b3c" stroke="#ff0" stroke-width="4"/>
+            <text x="10" y="20" font-size="12" fill="#ff0" font-family="StarJediHollow">Costco Retail UX Innovation</text>
+            <path d="M20 50 Q40 40 60 50" stroke="#800080" stroke-width="3" opacity="0.8">
+              <animate attributeName="d" values="M20 50 Q40 40 60 50;M20 50 Q40 45 60 50;M20 50 Q40 40 60 50" dur="2.5s" repeatCount="indefinite"/>
+            </path>
+            <rect x="40" y="60" width="20" height="20" fill="#ff0" opacity="0.7">
+              <animate attributeName="opacity" values="0.7;1;0.7" dur="2s" repeatCount="indefinite"/>
+            </rect>
+          </svg>
+          <h3 class="text-xl text-yellow-300 multicolor-glow">Costco Retail UX Innovation</h3>
+        </div>
+        <p class="terminal-text mt-2">UX Strategy • Agile A3 • System Mapping</p>
+        <a href="project-retail-ux.html" class="mt-4 inline-block px-4 py-2 bg-yellow-500 text-black rounded multicolor-glow lightsaber-cursor">Full Story</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Galactic Research Archives -->
+  <section id="galactic-research" class="min-h-screen flex flex-col justify-center items-center p-8 bg-black bg-opacity-50 fade-in">
+    <h2 class="text-4xl text-yellow-400 multicolor-glow mb-6">Galactic Research Archives</h2>
+    <div class="space-y-4 max-w-5xl">
+      <div class="p-4 bg-black bg-opacity-70 border-2 border-yellow-500 rounded-lg">
+        <h3 class="text-2xl text-yellow-300 multicolor-glow mb-2">The Critical Importance of GRC</h3>
+        <svg class="project-graphic grc-security" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="0" y="0" width="80" height="80" fill="#1a2b3c" stroke="#ff0" stroke-width="3"/>
+          <text x="5" y="15" font-size="10" fill="#ff0" font-family="StarJediHollow">The Critical Importance of GRC</text>
+          <rect x="10" y="25" width="60" height="40" fill="#0000ff" opacity="0.5"/>
+          <path d="M10 35 L70 35 M10 45 L70 45" stroke="#ff0" stroke-width="2" fill="none"/>
+          <circle cx="40" cy="40" r="4" fill="#ff0000">
+            <animate attributeName="r" values="4;5;4" dur="2s" repeatCount="indefinite"/>
+          </circle>
+        </svg>
+        <p class="text-lg mt-1">A comprehensive analysis of Governance, Risk, and Compliance (GRC) frameworks, focusing on enhancing cybersecurity.</p>
+        <a href="paper-grc.html" class="mt-2 inline-block px-3 py-1 bg-yellow-500 text-black rounded multicolor-glow lightsaber-cursor">View Paper</a>
+      </div>
+      <div class="p-4 bg-black bg-opacity-70 border-2 border-yellow-500 rounded-lg">
+        <h3 class="text-2xl text-yellow-300 multicolor-glow mb-2">Organizational Leadership Strategy (Costco)</h3>
+        <svg class="project-graphic leadership-command" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="0" y="0" width="80" height="80" fill="#1a2b3c" stroke="#ff0" stroke-width="3"/>
+          <text x="5" y="15" font-size="10" fill="#ff0" font-family="StarJediHollow">Organizational Leadership Strategy</text>
+          <rect x="30" y="30" width="20" height="20" fill="#00ff00" transform="rotate(45 40 40)">
+            <animateTransform attributeName="transform" type="rotate" from="0 40 40" to="360 40 40" dur="3s" repeatCount="indefinite"/>
+          </rect>
+          <rect x="20" y="20" width="40" height="40" fill="none" stroke="#ff0" stroke-width="2"/>
+        </svg>
+        <p class="text-lg mt-1">Explored leadership strategies at Costco, focusing on organizational structure and employee engagement.</p>
+        <a href="paper-leadership-costco.html" class="mt-2 inline-block px-3 py-1 bg-yellow-500 text-black rounded multicolor-glow lightsaber-cursor">View Paper</a>
+      </div>
+      <div class="p-4 bg-black bg-opacity-70 border-2 border-yellow-500 rounded-lg">
+        <h3 class="text-2xl text-yellow-300 multicolor-glow mb-2">Strategic Leadership & Innovation (Reconstructed)</h3>
+        <svg class="project-graphic innovation-blueprint" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="0" y="0" width="80" height="80" fill="#1a2b3c" stroke="#ff0" stroke-width="3"/>
+          <text x="5" y="15" font-size="10" fill="#ff0" font-family="StarJediHollow">Strategic Leadership & Innovation</text>
+          <path d="M10 40 Q30 30 50 40 Q70 30 80 40" stroke="#800080" stroke-width="2" opacity="0.8">
+            <animate attributeName="d" values="M10 40 Q30 30 50 40 Q70 30 80 40;M10 40 Q30 35 50 40 Q70 35 80 40;M10 40 Q30 30 50 40 Q70 30 80 40" dur="2.5s" repeatCount="indefinite"/>
+          </path>
+          <rect x="30" y="50" width="20" height="20" fill="#ff0" opacity="0.7"/>
+        </svg>
+        <p class="text-lg mt-1">Investigated strategic leadership and innovation, reconstructing frameworks for modern challenges.</p>
+        <a href="paper-strategic-leadership.html" class="mt-2 inline-block px-3 py-1 bg-yellow-500 text-black rounded multicolor-glow lightsaber-cursor">View Paper</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Command Post Log -->
+  <section id="command-post" class="min-h-screen flex flex-col justify-center items-center p-8 fade-in">
+    <h2 class="text-4xl text-yellow-400 multicolor-glow mb-6">Command Post Log</h2>
+    <p class="terminal-text text-lg max-w-2xl text-center">Deep within the cyber halls of Clark University, I operated the Command Post — serving as a Graduate Teaching Assistant in the School of Computing. My mission? Equip the next generation of cyber defenders with the tools, mindset, and discipline of a true Jedi. From guiding students through penetration testing labs to troubleshooting Metasploit simulations, I helped them master the digital force behind ethical hacking. Whether decoding packets in Wireshark, scanning networks with Nmap, or leading simulation briefings, I didn’t just teach — I mentored, challenged, and inspired. My toolkit was sharp, my standards sharper, and my goal clear: to forge cybersecurity practitioners ready to protect the galaxy of data systems from the dark side. This wasn’t a classroom — it was a war room. And I stood at the helm.</p>
+    <a href="#mission-logs" class="mt-8 inline-block px-6 py-2 bg-yellow-500 text-black rounded multicolor-glow lightsaber-cursor hyperspace-jump">Back to Portfolio</a>
+  </section>
+
+  <!-- Operation Saheli -->
+  <section id="saheli" class="min-h-screen flex flex-col justify-center items-center p-8 bg-black bg-opacity-50 fade-in">
+    <h2 class="text-4xl text-yellow-400 multicolor-glow mb-6">Operation Saheli</h2>
+    <p class="terminal-text text-lg max-w-2xl text-center">In galaxies where silence surrounds topics like menstrual health, we became the voice no one else dared to be. Operation Saheli — "Saheli" meaning friend in Hindi — wasn’t just a mission. It was a movement. We ventured into rural orphanages in India, where these conversations were nonexistent. With compassion in one hand and courage in the other, we created a space for 200+ girls to learn, speak, and be heard. We didn’t arrive as instructors — we arrived as Sahelis, friends, sisters, allies. With every diagram drawn and question answered, we rewrote the story of silence into one of strength. Because dignity is a right, not a privilege. And in that moment, we didn’t just teach biology — we shared humanity.</p>
+    <a href="#mission-logs" class="mt-8 inline-block px-6 py-2 bg-yellow-500 text-black rounded multicolor-glow lightsaber-cursor hyperspace-jump">Back to Portfolio</a>
+  </section>
+
+  <!-- Bored of My Profile? -->
+  <section id="bored" class="min-h-screen flex flex-col justify-center items-center p-8 fade-in">
+    <h2 class="text-4xl text-yellow-400 multicolor-glow mb-6">Bored of My Profile?</h2>
+    <p class="terminal-text text-lg max-w-2xl text-center">Take a break and blast some enemy ships in this galactic shooter! Survive as long as you can and aim for a high score.</p>
+    <button id="startGame" class="mt-8 inline-block px-6 py-3 bg-yellow-500 text-black rounded multicolor-glow lightsaber-cursor">Launch Game</button>
+  </section>
+
+  <!-- Final Transmission – Narrative Version -->
+  <section id="contact" class="min-h-screen flex flex-col justify-center items-center p-8 fade-in">
+    <h2 class="text-4xl text-yellow-400 multicolor-glow mb-6">📡 Final Transmission – Narrative Version</h2>
+    <div class="text-center">
+      <p class="terminal-text text-lg max-w-2xl">The data flows quiet now… but the Jedi is still listening. Whether you're from this world or another, you can reach me via encrypted channel. I’m currently stationed in Massachusetts, USA — with my next full-time mission beginning July 2025 under OPT status. If your galaxy needs a data defender, a cybersecurity mentor, or a tech visionary who blends empathy with innovation — I’m just a transmission away.</p>
+      <p class="terminal-text text-lg mt-2">📨 Jedi ID: <a href="mailto:srimanreddy0511@gmail.com" class="terminal-text multicolor-glow lightsaber-cursor">srimanreddy0511@gmail.com</a></p>
+      <p class="terminal-text text-lg mt-2">🛰️ Signal Boost: <a href="https://www.linkedin.com/in/srimanrondla/" class="terminal-text multicolor-glow lightsaber-cursor">linkedin.com/in/srimanrondla</a></p>
+      <a href="resume.pdf" class="terminal-text text-lg mt-2 inline-block multicolor-glow lightsaber-cursor hyperspace-jump">📄 Resume Download</a>
+    </div>
+  </section>
+
+  <script>
+    // 3D Starfield Animation
+    const canvas = document.querySelector('.starfield');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const stars = [];
+    for (let i = 0; i < 200; i++) {
+      stars.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        z: Math.random() * canvas.width,
+        size: Math.random() * 2,
+        speed: Math.random() * 0.5 + 0.5
+      });
+    }
+    function animateStars() {
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      stars.forEach(star => {
+        star.z -= star.speed;
+        if (star.z <= 0) star.z = canvas.width;
+        const sx = (star.x - canvas.width / 2) * (canvas.width / star.z) + canvas.width / 2;
+        const sy = (star.y - canvas.height / 2) * (canvas.width / star.z) + canvas.height / 2;
+        const size = star.size * (canvas.width / star.z);
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.arc(sx, sy, Math.max(size, 0.5), 0, Math.PI * 2);
+        ctx.fill();
+        if (Math.random() < 0.01) {
+          ctx.beginPath();
+          ctx.moveTo(sx, sy);
+          ctx.lineTo(sx - size * 10, sy - size * 10);
+          ctx.strokeStyle = 'rgba(255, 255, 0, 0.5)';
+          ctx.stroke();
+        }
+      });
+      requestAnimationFrame(animateStars);
+    }
+    animateStars();
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+
+    // Audio Controls
+    const crawlTheme = document.getElementById('crawlTheme');
+    const lightsaberHum = document.getElementById('lightsaberHum');
+    const muteButton = document.getElementById('muteButton');
+    crawlTheme.play().catch(error => console.log("Crawl theme play failed:", error));
+    muteButton.addEventListener('click', () => {
+      if (crawlTheme.muted) {
+        crawlTheme.muted = false;
+        muteButton.textContent = 'Mute';
+      } else {
+        crawlTheme.muted = true;
+        muteButton.textContent = 'Unmute';
+      }
+    });
+
+    // Lightsaber Hum on Hover
+    const interactiveElements = document.querySelectorAll('a, .card-container');
+    interactiveElements.forEach(element => {
+      element.addEventListener('mouseover', () => {
+        lightsaberHum.currentTime = 0;
+        lightsaberHum.play().catch(error => console.log("Lightsaber hum play failed:", error));
+      });
+      element.addEventListener('mouseout', () => {
+        lightsaberHum.pause();
+        lightsaberHum.currentTime = 0;
+      });
+    });
+
+    // Hyperspace Jump Effect
+    const navLinks = document.querySelectorAll('nav a');
+    navLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetId = link.getAttribute('href').substring(1);
+        const targetSection = document.getElementById(targetId);
+        if (targetSection) {
+          document.body.classList.add('hyperspace-jump');
+          setTimeout(() => {
+            targetSection.scrollIntoView({ behavior: 'smooth' });
+            document.body.classList.remove('hyperspace-jump');
+          }, 500);
+        }
+      });
+    });
+
+    // Title and Crawl Animation
+    const title = document.getElementById('title');
+    const crawl = document.getElementById('crawl');
+    const navbar = document.getElementById('navbar');
+    let titleFaded = false;
+    setTimeout(() => {
+      title.style.opacity = '0';
+      setTimeout(() => {
+        title.style.display = 'none';
+        titleFaded = true;
+        crawl.style.display = 'block';
+      }, 1000);
+    }, 5000);
+    window.addEventListener('scroll', () => {
+      if (titleFaded && window.scrollY > 50) {
+        crawl.style.display = 'block';
+        navbar.classList.add('nav-hidden');
+      } else {
+        crawl.style.display = 'none';
+        navbar.classList.remove('nav-hidden');
+      }
+    });
+
+    // Scroll-Triggered Fade-In
+    const sections = document.querySelectorAll('section');
+    const observer = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('fade-in');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    sections.forEach(section => observer.observe(section));
+
+    // Card Flip Animation
+    document.querySelectorAll('.card-container').forEach(container => {
+      container.addEventListener('click', () => {
+        const card = container.querySelector('.card');
+        card.classList.toggle('flipped');
+      });
+    });
+
+    // 3D Answer Tilt Effect
+    document.querySelectorAll('.card-back p').forEach(answer => {
+      const card = answer.closest('.card');
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+        const rotateX = Math.min(Math.max(-y / 30, -10), 10);
+        const rotateY = Math.min(Math.max(x / 30, -10), 10);
+        answer.style.transform = `translateZ(20px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+      });
+      card.addEventListener('mouseleave', () => {
+        answer.style.transform = 'translateZ(20px)';
+      });
+    });
+
+    // Terminal Typing Animation Delay
+    document.querySelectorAll('.terminal-text').forEach((el, index) => {
+      el.style.animationDelay = `${index * 0.5}s`;
+    });
+
+    // Spaceship Shooter Game
+    const startGameBtn = document.getElementById('startGame');
+    const gameOverlay = document.getElementById('gameOverlay');
+    const gameCanvas = document.getElementById('gameCanvas');
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    const gameOverScreen = document.getElementById('gameOver');
+    const finalScore = document.getElementById('finalScore');
+    const restartGameBtn = document.getElementById('restartGame');
+    const gameCtx = gameCanvas.getContext('2d');
+
+    let gameLoop;
+    let player = { x: 400, y: 550, width: 40, height: 20, speed: 5 };
+    let bullets = [];
+    let enemies = [];
+    let score = 0;
+    let gameRunning = false;
+
+    function startGame() {
+      document.querySelectorAll('section, nav, a.fixed').forEach(el => el.style.display = 'none');
+      gameOverlay.style.display = 'flex';
+      gameRunning = true;
+      score = 0;
+      scoreDisplay.textContent = `Score: ${score}`;
+      bullets = [];
+      enemies = [];
+      player.x = 400;
+      gameOverScreen.style.display = 'none';
+      gameCanvas.style.display = 'block';
+      spawnEnemies();
+      gameLoop = setInterval(updateGame, 1000 / 60);
+    }
+
+    function updateGame() {
+      if (!gameRunning) return;
+      gameCtx.fillStyle = '#000';
+      gameCtx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
+
+      // Player movement
+      if (keys['ArrowLeft'] || keys['a']) player.x -= player.speed;
+      if (keys['ArrowRight'] || keys['d']) player.x += player.speed;
+      if (player.x < 0) player.x = 0;
+      if (player.x > gameCanvas.width - player.width) player.x = gameCanvas.width - player.width;
+
+      // Draw player (spaceship)
+      gameCtx.fillStyle = '#ff0';
+      gameCtx.beginPath();
+      gameCtx.moveTo(player.x, player.y);
+      gameCtx.lineTo(player.x + player.width / 2, player.y - player.height);
+      gameCtx.lineTo(player.x + player.width, player.y);
+      gameCtx.closePath();
+      gameCtx.fill();
+
+      // Bullets
+      gameCtx.fillStyle = '#00ff00';
+      bullets = bullets.filter(b => b.y > 0);
+      bullets.forEach(bullet => {
+        bullet.y -= 5;
+        gameCtx.fillRect(bullet.x, bullet.y, 2, 10);
+      });
+
+      // Enemies
+      gameCtx.fillStyle = '#ff0000';
+      enemies = enemies.filter(e => e.y < gameCanvas.height);
+      enemies.forEach(enemy => {
+        enemy.y += 2;
+        gameCtx.fillRect(enemy.x, enemy.y, 20, 20);
+
+        // Collision detection
+        bullets.forEach((bullet, bIndex) => {
+          if (bullet.x >= enemy.x && bullet.x <= enemy.x + 20 &&
+              bullet.y >= enemy.y && bullet.y <= enemy.y + 20) {
+            enemies.splice(enemies.indexOf(enemy), 1);
+            bullets.splice(bIndex, 1);
+            score += 10;
+            scoreDisplay.textContent = `Score: ${score}`;
+          }
+        });
+
+        // Game over if enemy reaches bottom
+        if (enemy.y >= gameCanvas.height - 20) {
+          endGame();
+        }
+      });
+
+      // Spawn new enemies
+      if (Math.random() < 0.02) spawnEnemies();
+    }
+
+    function spawnEnemies() {
+      const x = Math.random() * (gameCanvas.width - 20);
+      enemies.push({ x, y: 0 });
+    }
+
+    function endGame() {
+      gameRunning = false;
+      clearInterval(gameLoop);
+      gameCanvas.style.display = 'none';
+      gameOverScreen.style.display = 'block';
+      finalScore.textContent = `Final Score: ${score}`;
+    }
+
+    let keys = {};
+    window.addEventListener('keydown', e => {
+      keys[e.key] = true;
+      if (e.key === ' ' && gameRunning) {
+        bullets.push({ x: player.x + player.width / 2 - 1, y: player.y - 10 });
+      }
+    });
+    window.addEventListener('keyup', e => keys[e.key] = false);
+
+    startGameBtn.addEventListener('click', startGame);
+    restartGameBtn.addEventListener('click', () => {
+      gameOverlay.style.display = 'none';
+      document.querySelectorAll('section, nav, a.fixed').forEach(el => el.style.display = 'block');
+    });
+  </script>
+</body>
+</html>

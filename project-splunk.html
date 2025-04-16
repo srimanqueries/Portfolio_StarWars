@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crime Data Analysis – Splunk - Sriman Reddy Rondla</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+  <style>
+    @font-face {
+      font-family: 'StarJediHollow';
+      src: url('StarJediHollow.woff2') format('woff2');
+      font-weight: normal;
+      font-style: normal;
+    }
+    body {
+      background: #000;
+      color: #e0e0e0;
+      font-family: 'StarJediHollow', sans-serif;
+      overflow-x: hidden;
+    }
+    .starfield {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+    .multicolor-glow {
+      animation: glow 3s infinite;
+    }
+    @keyframes glow {
+      0% { text-shadow: 0 0 10px #ff0, 0 0 20px #ff0; filter: drop-shadow(0 0 10px #ff0); }
+      33% { text-shadow: 0 0 10px #f00, 0 0 20px #f00; filter: drop-shadow(0 0 10px #f00); }
+      66% { text-shadow: 0 0 10px #00f, 0 0 20px #00f; filter: drop-shadow(0 0 10px #00f); }
+      100% { text-shadow: 0 0 10px #ff0, 0 0 20px #ff0; filter: drop-shadow(0 0 10px #ff0); }
+    }
+    .terminal-text {
+      font-family: 'VT323', monospace;
+      color: #00ff00;
+      opacity: 0;
+      animation: type 2s steps(30, end) forwards;
+    }
+    @keyframes type {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(255, 255, 0, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(255, 255, 0, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 255, 0, 0); }
+    }
+    .lightsaber-cursor {
+      cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><rect x="14" y="0" width="4" height="32" fill="yellow" filter="url(%23glow)"/><defs><filter id="glow"><feGaussianBlur stdDeviation="2" result="glow"/><feMerge><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs></svg>') 16 16, auto;
+    }
+    .badge {
+      background: rgba(255, 255, 0, 0.2);
+      border: 1px solid #ff0;
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      color: #ff0;
+    }
+    .feature-item {
+      position: relative;
+      padding-left: 1.5rem;
+    }
+    .feature-item::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: #ff0;
+      animation: featurePulse 2s infinite;
+    }
+    @keyframes featurePulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+    .project-graphic {
+      width: 150px;
+      height: 150px;
+      margin: 12px 0;
+      z-index: 30;
+    }
+    .splunk-heat {
+      animation: flicker-heat 1.5s infinite;
+    }
+    @keyframes flicker-heat {
+      0% { opacity: 0.9; }
+      50% { opacity: 1; }
+      100% { opacity: 0.9; }
+    }
+    .achievement-highlight {
+      font-size: 16px;
+      color: #ff0;
+      text-shadow: 0 0 5px #ff0;
+      padding: 2px;
+      animation: pulse-highlight 2s infinite;
+    }
+    @keyframes pulse-highlight {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    @media (max-width: 768px) {
+      h1 { font-size: 2rem; }
+      .text-xl { font-size: 1rem; }
+      .text-lg { font-size: 0.875rem; }
+      .project-graphic {
+        width: 100px;
+        height: 100px;
+      }
+      .achievement-highlight {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Starfield Canvas -->
+  <canvas class="starfield"></canvas>
+
+  <!-- Navigation -->
+  <nav class="w-full bg-black bg-opacity-50 p-4 flex justify-between items-center z-20">
+    <a href="index.html" class="text-2xl text-yellow-400 multicolor-glow lightsaber-cursor">Sriman Reddy Rondla</a>
+    <div class="space-x-4">
+      <a href="index.html#about" class="text-yellow-300 multicolor-glow lightsaber-cursor">About</a>
+      <a href="index.html#jedi-profile" class="text-yellow-300 multicolor-glow lightsaber-cursor">Jedi Profile</a>
+      <a href="index.html#mission-logs" class="text-yellow-300 multicolor-glow lightsaber-cursor">Mission Logs</a>
+      <a href="index.html#archives" class="text-yellow-300 multicolor-glow lightsaber-cursor">Archives</a>
+      <a href="index.html#command-post" class="text-yellow-300 multicolor-glow lightsaber-cursor">Command Post</a>
+      <a href="index.html#saheli" class="text-yellow-300 multicolor-glow lightsaber-cursor">Saheli</a>
+      <a href="index.html#contact" class="text-yellow-300 multicolor-glow lightsaber-cursor">Contact</a>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <section class="min-h-screen flex flex-col justify-center items-center p-8 z-30">
+    <h1 class="text-4xl text-yellow-400 multicolor-glow mb-6">Crime Data Analysis – Splunk</h1>
+    <svg class="project-graphic splunk-heat" viewBox="0 0 150 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="0" width="150" height="150" fill="#1a2b3c" stroke="#ff0" stroke-width="6"/>
+      <text x="10" y="20" font-size="18" fill="#ff0" font-family="StarJediHollow">Crime Data Analysis – Splunk</text>
+      <rect x="30" y="50" width="90" height="60" fill="url(#heatmap)" opacity="0.6"/>
+      <circle cx="75" cy="80" r="8" fill="#ff4500">
+        <animate attributeName="r" values="8;10;8" dur="1.5s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="60" cy="70" r="5" fill="#ff0000">
+        <animate attributeName="r" values="5;7;5" dur="1.5s" repeatCount="indefinite"/>
+      </circle>
+      <rect x="105" y="70" width="15" height="30" fill="#333" stroke="#ff0"/>
+      <path d="M15 130 L25 125 L35 130 L45 125 L55 130" stroke="#ff0" stroke-width="2" fill="none" opacity="0.6"/>
+      <defs>
+        <radialGradient id="heatmap">
+          <stop offset="0%" stop-color="#ff0000"/>
+          <stop offset="100%" stop-color="#ff4500"/>
+        </radialGradient>
+      </defs>
+    </svg>
+    <!-- Overview -->
+    <div class="mb-8">
+      <h2 class="text-2xl text-yellow-300 multicolor-glow mb-4">Overview</h2>
+      <p class="terminal-text text-lg">Analyzed over 10,000 crime reports using Splunk to identify patterns and trends, creating interactive dashboards and heatmaps. This project enhanced security insights for a simulated urban area, processing real-time data to support law enforcement strategies.</p>
+    </div>
+    <!-- Objectives -->
+    <div class="mb-8">
+      <h2 class="text-2xl text-yellow-300 multicolor-glow mb-4">Objectives</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-full">
+        <div class="p-4 bg-black bg-opacity-70 border-2 border-yellow-500 rounded-lg transform hover:scale-105 transition">
+          <p class="terminal-text">Identify crime patterns with Splunk</p>
+        </div>
+        <div class="p-4 bg-black bg-opacity-70 border-2 border-yellow-500 rounded-lg transform hover:scale-105 transition">
+          <p class="terminal-text">Develop interactive dashboards</p>
+        </div>
+        <div class="p-4 bg-black bg-opacity-70 border-2 border-yellow-500 rounded-lg transform hover:scale-105 transition">
+          <p class="terminal-text">Visualize data with heatmaps</p>
+        </div>
+      </div>
+    </div>
+    <!-- Tools -->
+    <div class="mb-8">
+      <h2 class="text-2xl text-yellow-300 multicolor-glow mb-4">Tools</h2>
+      <div class="flex flex-wrap gap-4">
+        <span class="badge multicolor-glow">Splunk</span>
+        <span class="badge multicolor-glow">Python</span>
+        <span class="badge multicolor-glow">Tableau</span>
+      </div>
+    </div>
+    <!-- Notable Achievements -->
+    <div class="mb-8">
+      <h2 class="text-2xl text-yellow-300 multicolor-glow mb-4">Notable Achievements</h2>
+      <p class="achievement-highlight">Uncovered 15% more crime patterns, enhancing security for a safer universe!</p>
+    </div>
+    <!-- Technical Insights -->
+    <div class="mb-8">
+      <h2 class="text-2xl text-yellow-300 multicolor-glow mb-4">Technical Insights</h2>
+      <ul class="space-y-2">
+        <li class="feature-item terminal-text">Created temporal heatmaps to track crime trends over time.</li>
+        <li class="feature-item terminal-text">Designed custom Splunk dashboards for real-time monitoring.</li>
+        <li class="feature-item terminal-text">Imported and processed 10,000+ records using Python scripts.</li>
+      </ul>
+    </div>
+    <!-- Back to Portfolio -->
+    <a href="index.html#mission-logs" class="inline-block px-6 py-3 bg-yellow-500 text-black rounded multicolor-glow lightsaber-cursor">Back to Portfolio</a>
+  </section>
+
+  <script>
+    // 3D Starfield Animation
+    const canvas = document.querySelector('.starfield');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const stars = [];
+    for (let i = 0; i < 200; i++) {
+      stars.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        z: Math.random() * canvas.width,
+        size: Math.random() * 2,
+        speed: Math.random() * 0.5 + 0.5
+      });
+    }
+    function animateStars() {
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      stars.forEach(star => {
+        star.z -= star.speed;
+        if (star.z <= 0) star.z = canvas.width;
+        const sx = (star.x - canvas.width / 2) * (canvas.width / star.z) + canvas.width / 2;
+        const sy = (star.y - canvas.height / 2) * (canvas.width / star.z) + canvas.height / 2;
+        const size = star.size * (canvas.width / star.z);
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.arc(sx, sy, Math.max(size, 0.5), 0, Math.PI * 2);
+        ctx.fill();
+        if (Math.random() < 0.01) {
+          ctx.beginPath();
+          ctx.moveTo(sx, sy);
+          ctx.lineTo(sx - size * 10, sy - size * 10);
+          ctx.strokeStyle = 'rgba(255, 255, 0, 0.5)';
+          ctx.stroke();
+        }
+      });
+      requestAnimationFrame(animateStars);
+    }
+    animateStars();
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+
+    // Terminal Typing Animation Delay
+    document.querySelectorAll('.terminal-text').forEach((el, index) => {
+      el.style.animationDelay = `${index * 0.5}s`;
+    });
+  </script>
+</body>
+</html>
