@@ -244,6 +244,7 @@
     .game-canvas {
       border: 2px solid #ff0;
       background: #000;
+      touch-action: none;
     }
     .game-score {
       color: #ff0;
@@ -268,6 +269,30 @@
       font-family: 'StarJediHollow', sans-serif;
       cursor: pointer;
     }
+    #muteButton {
+      position: fixed;
+      top: 4rem;
+      right: 4rem;
+      background: #ff0;
+      color: #000;
+      padding: 8px 16px;
+      border-radius: 5px;
+      font-family: 'StarJediHollow', sans-serif;
+      cursor: pointer;
+      z-index: 60;
+    }
+    #playMusicButton {
+      position: fixed;
+      top: 7rem;
+      right: 4rem;
+      background: #ff0;
+      color: #000;
+      padding: 8px 16px;
+      border-radius: 5px;
+      font-family: 'StarJediHollow', sans-serif;
+      cursor: pointer;
+      z-index: 50;
+    }
     @media (max-width: 768px) {
       .crawl { font-size: 1rem; }
       .crawl-intro { font-size: 1.25rem; }
@@ -284,7 +309,11 @@
         height: 150px;
       }
       .card-back p {
-        font-size: 1rem;
+        font-size: 0.875rem;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        hyphens: auto;
+        padding: 0.5rem;
       }
       .jedi-photo {
         width: 90%;
@@ -298,6 +327,72 @@
         width: 90%;
         height: 70%;
       }
+      #muteButton {
+        top: 1rem;
+        right: 1rem;
+        padding: 6px 12px;
+        font-size: 0.875rem;
+        z-index: 60;
+      }
+      #playMusicButton {
+        top: 3.5rem;
+        right: 1rem;
+        padding: 6px 12px;
+        font-size: 0.875rem;
+        z-index: 50;
+      }
+      /* Fix section stacking */
+      section {
+        min-height: auto;
+        height: auto;
+        padding: 2rem 1rem;
+        position: relative;
+        z-index: 30;
+      }
+      /* Fix navigation bar */
+      nav {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      nav .space-x-4 {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      nav a {
+        font-size: 0.875rem;
+      }
+      /* Fix Jedi Profile cards */
+      #jedi-profile .grid {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+      /* Fix About section */
+      #about .flex {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      /* Fix Mission Logs grid */
+      #mission-logs .grid {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+      #mission-logs .grid > div {
+        width: 100%;
+      }
+      /* Fix Galactic Research Archives */
+      #galactic-research .space-y-4 {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+      #galactic-research .space-y-4 > div {
+        width: 100%;
+      }
     }
   </style>
 </head>
@@ -308,7 +403,8 @@
   <!-- Audio Controls -->
   <audio id="crawlTheme" src="starwars_crawl.mp3" loop></audio>
   <audio id="lightsaberHum" src="lightsaber_hum.mp3" preload="auto"></audio>
-  <button id="muteButton" class="fixed top-4 right-4 bg-yellow-500 text-black p-2 rounded multicolor-glow lightsaber-cursor">Mute</button>
+  <button id="muteButton" class="multicolor-glow lightsaber-cursor">Mute</button>
+  <button id="playMusicButton" class="multicolor-glow lightsaber-cursor">Play Music</button>
 
   <!-- Game Overlay -->
   <div id="gameOverlay" class="game-overlay">
@@ -652,7 +748,18 @@
     const crawlTheme = document.getElementById('crawlTheme');
     const lightsaberHum = document.getElementById('lightsaberHum');
     const muteButton = document.getElementById('muteButton');
-    crawlTheme.play().catch(error => console.log("Crawl theme play failed:", error));
+    const playMusicButton = document.getElementById('playMusicButton');
+    let audioStarted = false;
+
+    playMusicButton.addEventListener('click', () => {
+      if (!audioStarted) {
+        crawlTheme.play().catch(error => console.log("Crawl theme play failed:", error));
+        audioStarted = true;
+        playMusicButton.textContent = 'Music Playing';
+        playMusicButton.disabled = true;
+      }
+    });
+
     muteButton.addEventListener('click', () => {
       if (crawlTheme.muted) {
         crawlTheme.muted = false;
@@ -663,16 +770,32 @@
       }
     });
 
-    // Lightsaber Hum on Hover
+    // Lightsaber Hum on Hover and Touch
     const interactiveElements = document.querySelectorAll('a, .card-container');
     interactiveElements.forEach(element => {
       element.addEventListener('mouseover', () => {
-        lightsaberHum.currentTime = 0;
-        lightsaberHum.play().catch(error => console.log("Lightsaber hum play failed:", error));
+        if (audioStarted) {
+          lightsaberHum.currentTime = 0;
+          lightsaberHum.play().catch(error => console.log("Lightsaber hum play failed:", error));
+        }
       });
       element.addEventListener('mouseout', () => {
-        lightsaberHum.pause();
-        lightsaberHum.currentTime = 0;
+        if (audioStarted) {
+          lightsaberHum.pause();
+          lightsaberHum.currentTime = 0;
+        }
+      });
+      element.addEventListener('touchstart', () => {
+        if (audioStarted) {
+          lightsaberHum.currentTime = 0;
+          lightsaberHum.play().catch(error => console.log("Lightsaber hum play failed:", error));
+        }
+      });
+      element.addEventListener('touchend', () => {
+        if (audioStarted) {
+          lightsaberHum.pause();
+          lightsaberHum.currentTime = 0;
+        }
       });
     });
 
@@ -734,6 +857,10 @@
         const card = container.querySelector('.card');
         card.classList.toggle('flipped');
       });
+      container.addEventListener('touchstart', () => {
+        const card = container.querySelector('.card');
+        card.classList.toggle('flipped');
+      });
     });
 
     // 3D Answer Tilt Effect
@@ -773,9 +900,11 @@
     let enemies = [];
     let score = 0;
     let gameRunning = false;
+    let touchStartX = null;
+    let touchLastX = null;
 
     function startGame() {
-      document.querySelectorAll('section, nav, a.fixed').forEach(el => el.style.display = 'none');
+      document.querySelectorAll('section, nav, a.fixed, #playMusicButton').forEach(el => el.style.display = 'none');
       gameOverlay.style.display = 'flex';
       gameRunning = true;
       score = 0;
@@ -797,6 +926,11 @@
       // Player movement
       if (keys['ArrowLeft'] || keys['a']) player.x -= player.speed;
       if (keys['ArrowRight'] || keys['d']) player.x += player.speed;
+      if (touchLastX !== null) {
+        const deltaX = touchLastX - touchStartX;
+        player.x += deltaX * 0.05;
+        touchStartX = touchLastX;
+      }
       if (player.x < 0) player.x = 0;
       if (player.x > gameCanvas.width - player.width) player.x = gameCanvas.width - player.width;
 
@@ -867,10 +1001,31 @@
     });
     window.addEventListener('keyup', e => keys[e.key] = false);
 
+    // Touch controls for mobile
+    gameCanvas.addEventListener('touchstart', e => {
+      e.preventDefault();
+      const touch = e.touches[0];
+      touchStartX = touch.clientX;
+      touchLastX = touchStartX;
+      bullets.push({ x: player.x + player.width / 2 - 1, y: player.y - 10 });
+    });
+
+    gameCanvas.addEventListener('touchmove', e => {
+      e.preventDefault();
+      const touch = e.touches[0];
+      touchLastX = touch.clientX;
+    });
+
+    gameCanvas.addEventListener('touchend', e => {
+      e.preventDefault();
+      touchStartX = null;
+      touchLastX = null;
+    });
+
     startGameBtn.addEventListener('click', startGame);
     restartGameBtn.addEventListener('click', () => {
       gameOverlay.style.display = 'none';
-      document.querySelectorAll('section, nav, a.fixed').forEach(el => el.style.display = 'block');
+      document.querySelectorAll('section, nav, a.fixed, #playMusicButton').forEach(el => el.style.display = 'block');
     });
   </script>
 </body>
